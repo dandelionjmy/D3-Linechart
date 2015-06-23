@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3.v3.js"></script>
+        <script src="d3tip.js"></script>
+        <script src="d3.legend.js"></script>
+        <script type="text/javascript", src="stocks.js"></script>
+        <script type="text/javascript", src="test_data.js"></script>
+        <style type="text/css"></style>
+        <style>
+            body {
+                font: 10px sans-serif;
+            }
+
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: #000;
+                shape-rendering: crispEdges;
+            }
+
+            .line {
+                fill: none;
+            }
+
+            .line--hover {
+                stroke-width: 5px !important;
+            }      
+
+            .focus circle {
+                fill: none;
+                stroke: black;
+            }
+
+            #form {
+                position: absolute;
+            } 
+
+            .voronoi--show path {
+                stroke: red;
+                stroke-opacity: .2;
+            }
+
+        </style>
+    </head>
+    <body>
+        <label id="form" for="show-voronoi">
+            Show Voronoi
+        <input type="checkbox" id="show-voronoi">
+        </label>
+        <div id="container"></div>
+        <script src="require.js" data-main="main.js">
+        </script>
+    </body>
+</html>
