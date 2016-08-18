@@ -13,17 +13,18 @@ function(d3, dispatcher) {
       * Object that stores the color for the data legend.
       * @memberof module:legend
       * @inner
+      * default is the color of the line chart
       */
       /* **/
       var color;
 
       /**
-      * Variable that stores the color for the data legend.
+      * Variable that stores the size for the data legend.
       * @memberof module:legend
       * @inner
       */
       /* **/
-      var size;
+      var legend_size;
 
       /**
       * Object that stores the order for the data legend.
@@ -33,36 +34,52 @@ function(d3, dispatcher) {
       /* **/
       var order;
 
+      /**
+      * Object that stores the position for the data legend.
+      * @memberof module:legend
+      * @inner
+      */
+      /* **/
       var position;
 
-      function util(_selection) {
-         _selection.each(function(_data) {
+      function util(_selection) {  
+         /**module goes within the module function below var dispatch definition*/
+         _selection.each(function() {
 
-            items = {};
-            var g = d3.select(this),
+            if (!legend_size) {
+               legend_size = '12px';
+            }
+
+            var items = {},
+            //select the chart svg;
             svg = d3.select(".line-group"),
-            legendPadding = g.attr("data-style-padding") || 5,
-            lb = g.selectAll(".legend-box").data([true]),
-            li = g.selectAll(".legend-items").data([true]);
+            legendPadding = d3.select(this).attr("data-style-padding") || 5,
+            lb = d3.select(this).selectAll(".legend-box").data([true]),
+            li = d3.select(this).selectAll(".legend-items").data([true]);
 
             lb.enter().append("rect").classed("legend-box",true);
             li.enter().append("g").classed("legend-items",true);
 
-            svg.selectAll("[data-legend]").each(function() {
-               var self = d3.select(this);
-               items[self.attr("data-legend")] = {
-                  pos : self.attr("data-legend-pos") || this.getBBox().y,
-                  color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") : self.style("stroke") 
-               }
+            svg.selectAll("[data-legend]").each(function(d) {  
+               items[d.key] = {
+                  color : d.color
+               } 
             });
 
-            items = d3.entries(items).sort(function(a,b) { return a.key-b.key; })
-            console.log(items);
+            //sort by key;
+            items = d3.entries(items).sort(function(a,b) { return a.key - b.key; });
 
-            var legend_list = d3.select(this).selectAll("li").data(items, function(d){ return d.key;}).enter().append("li");
+            var legend_list = li.selectAll("li")  
+               .data(items, function(d){ return d.key;});
+
+            legend_list.enter().append("li")
+            .style("color", function(d) { return d.value.color; })
+            .style("font-size", "20px")
+            .style("padding-bottom", "15px");
 
             legend_list.append("span")
                .style("color", function(d) { return d.value.color; })
+               .style("font-size", legend_size)
                .html(function(d) { return d.key;})
                .on("click", function(d) {
                   if (d3.select("#legend-container").select("#input-"+d.key).property("checked")) {
@@ -72,32 +89,18 @@ function(d3, dispatcher) {
                      d3.select("#legend-container").select("#input-"+d.key).property("checked", true);
                   }
                   dispatcher.dispatch.click_legend(d);
-               })      
+               });
 
             legend_list.append("input")
                .attr("type", "checkbox")
                .attr("id", function(d) {return 'input-'+d.key;})
+               .style("margin-left", "12px")
                .property("checked", true)
                .on("change", function(d) {
                   dispatcher.dispatch.click_legend(d);
-               });
-/**
-            li.selectAll("text")
-               .data(items,function(d) { return d.key})
-               .call(function(d) { d.enter().append("text")})
-               .call(function(d) { d.exit().remove()})
-               .attr("y",function(d,i) { return i+"em"})
-               .attr("x","1em")
-               .text(function(d) { ;return d.key})
-            
-            li.selectAll("circle")
-               .data(items,function(d) { return d.key})
-               .call(function(d) { d.enter().append("circle")})
-               .call(function(d) { d.exit().remove()})
-               .attr("cy",function(d,i) { return i-0.25+"em"})
-               .attr("cx",0)
-               .attr("r","0.4em")
-               .style("fill",function(d) { console.log(d.value.color);return d.value.color})  **/
+               });  
+
+            legend_list.exit().remove();
 
          })
       }
@@ -108,9 +111,9 @@ function(d3, dispatcher) {
          return this;
       }
 
-      util.size = function(_x) {
-         if (!arguments.length) return size;
-         size = _x;
+      util.legend_size = function(_x) {
+         if (!arguments.length) return legend_size;
+         legend_size = _x;
          return this;
       }
 

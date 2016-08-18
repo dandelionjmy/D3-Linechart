@@ -3,7 +3,6 @@ require.config({
 paths: {
     "d3": "../linechart/d3.v3",
     "charts": "../linechart"
-
     }
 });
 
@@ -12,8 +11,9 @@ require([
     "charts/chart",
     "charts/tooltip",
     "charts/datamanager_modify",
+    "charts/legend",
     "dispatcher"
-], function(d3, chart, tooltip, datamanager_modify, dispatcher) {
+], function(d3, chart, tooltip, datamanager_modify, legend, dispatcher) {
   
    //position the checkbox according to the width and height of the chart;
    d3.select("#form")
@@ -78,7 +78,7 @@ require([
       .width(1000)
       .height(600);
 
-   linechart.x_scale(d3.scale.linear().domain([start, end]))
+   linechart.x_scale(d3.scale.linear())
       .y_scale(d3.scale.linear())
       .path_style(path_st)
       .circle_size(5)
@@ -86,9 +86,14 @@ require([
       .focus_on(true);
 
    d3.select("#main-canvas")
-      .datum(chart_datamanager.model_data())
+      .datum(test_data)
       .call(linechart);  
 
+   var line_legend = legend();
+
+   d3.select("#legend-container")
+      .call(line_legend);  
+/**
    var data_nest=d3.nest()
       .key(function(d) { return d.cat_var;})
       .entries(test_data);
@@ -116,7 +121,7 @@ require([
       .property("checked", true)
       .on("change", function(d) {
          dispatcher.dispatch.click_legend(d);
-      });
+      });  **/
 
    function update() {
       //update the chart;
@@ -139,7 +144,7 @@ require([
       linechart.category_var("symbol")
          .x("date")
          .y("price")
-         .x_scale(d3.time.scale().domain([start, end]))
+         .x_scale(d3.time.scale())
          .y_scale(d3.scale.linear().domain([0, 250]))
          .path_style(path_st)
          .stroke_width(2)
@@ -148,13 +153,16 @@ require([
          .chart_tooltip(focus_tooltip);
 
       d3.select("#main-canvas")
-         .datum(chart_datamanager.model_data())
+         .datum(stocks)
          .transition()
          .ease("linear")
          .call(linechart);
+
+      d3.select("#legend-container")
+         .call(line_legend);  
    }
 
-   //setTimeout(update, 4000);
+   setTimeout(update, 5000);
    //update();
 
    function update_data_2(context, original_dataset) {
@@ -181,13 +189,12 @@ require([
 
    dispatcher.dispatch.on("click_legend", function(d) {      
       var active = d.active? false : true;
-      /**
       new_opacity = active? 0 : 1;
       d3.select("#path-"+d.key.replace(/\s+/g, ''))
          .transition().duration(100)
-         .style("opacity",  new_opacity);  **/
+         .style("opacity",  new_opacity);  
       d.active = active;   
-
+/**
       if (active) {
          active_var.splice(active_var.indexOf(d.key), 1);
       }
@@ -205,14 +212,8 @@ require([
          .datum(new_data)
          .transition()
          .ease("linear")
-         .call(linechart);  
+         .call(linechart); **/
 
-        /**
-        chart_datamanager.update_model_fn(update_data_2);
-        chart_datamanager.update_model(chart_datamanager);
-        d3.select("#container")
-            .datum(chart_datamanager.model_data())
-            .call(linechart);  **/
     });   
 
 });

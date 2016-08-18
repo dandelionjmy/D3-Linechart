@@ -264,7 +264,7 @@ function(d3, dispatcher) {
                   return d.color = color_scale(d.key); })
                .style("stroke-width", function() { return typeof stroke_with == "undefined" ? 2 : stroke_width })
                .attr("d", function(d) { return line(d.values);})
-               .attr("data-legend", function(d) { return d.key})
+               .attr("data-legend", function(d) { return d.key; })
                .style("stroke-dasharray", function(d, i) {
                   if (path_style.has(d.key) && path_style.get(d.key) == "dashed") {
                         return ("3, 3");
@@ -286,7 +286,8 @@ function(d3, dispatcher) {
                   else {return ("3, 0"); 
                }});
 
-            lines.exit().transition().style({opacity: 0}).remove();
+            //lines.exit().transition().style({opacity: 0}).remove();
+            lines.exit().remove();
 
             var voronoi_lines = voronoi_group.selectAll(".voronoi-line")
                   .data(voronoi(_data))
